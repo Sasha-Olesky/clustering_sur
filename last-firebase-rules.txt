@@ -1,0 +1,615 @@
+{
+  "rules": {
+    "semanticVersionConstraint": {
+      ".validate": "newData.isString() && newData.val().length > 0",
+      ".read": "true"
+    },
+    "maintenance": {
+      ".validate": "newData.isBoolean()",
+      ".read": "true"
+    },
+    "md-catalog": {
+      "regions": {
+        "us": {
+          "categories": {
+            ".read": "true"
+          }
+        }
+      }
+    },
+    "users": {
+      "$key1": {
+        ".validate": "newData.hasChildren(['uid'])",
+        "uid": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "firstName": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "lastName": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "avatar": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().beginsWith('http')"
+        },
+        "gender": {
+          ".validate": "newData.isString() && (newData.val() == 'Female' || newData.val() == 'Male')"
+        },
+        "yearOfBorn": {
+          ".validate": "newData.isNumber() && newData.val() > 1900 && newData.val() < 2019"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        ".read": "true",
+        ".write": "auth != null && auth.uid == $key1"
+      },
+      ".validate": "newData.hasChildren()"
+    },
+    "user-active-device": {
+      "$userId": {
+        ".validate": "newData.hasChildren(['token', 'platform', 'changedAt']) && root.child('users').child($userId).val() != null",
+        "token": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "platform": {
+          ".validate": "newData.isString() && (newData.val() == 'Android' || newData.val() == 'iOS')"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        "changedAt": {
+          ".validate": "newData.isNumber() && newData.val() == now"
+        },
+        ".write": "auth != null && auth.uid == $userId"
+      }
+    },
+    "user-network-status": {
+      "$userId": {
+        ".validate": "newData.hasChildren(['isOnline', 'changedAt']) && root.child('users').child($userId).val() != null",
+        "isOnline": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        "changedAt": {
+          ".validate": "newData.isNumber() && newData.val() == now"
+        },
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid == $userId"
+      }
+    },
+    "recent": {
+      "profile-cover-image": {
+        "$userId": {
+          "$branchId": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().beginsWith('http')",
+            ".write": "auth != null && (auth != null && auth.uid == $userId)"
+          },
+          ".validate": "root.child('users').child($userId).val() != null",
+          ".read": "auth != null && (auth != null && auth.uid == $userId)"
+        }
+      }
+    },
+    "instructions": {
+      "seen": {
+        "$deviceId": {
+          "$name": {
+            ".validate": "newData.isBoolean()",
+            ".write": "auth != null && newData.val() == true"
+          },
+          ".read": "auth != null"
+        }
+      }
+    },
+    "card-tap-zone": {
+      "tapped": {
+        "$deviceId": {
+          "count": {
+            ".validate": "newData.isNumber()",
+            ".write": "auth != null"
+          },
+          ".read": "auth != null"
+        }
+      }
+    },
+    "counters": {
+      "sessionByDevice": {
+        "$deviceId": {
+          "count": {
+            ".validate": "newData.isNumber()",
+            ".write": "auth != null"
+          },
+          ".read": "auth != null"
+        }
+      },
+      "sessionByUser": {
+        "$userId": {
+          "count": {
+            ".validate": "newData.isNumber()",
+            ".write": "auth != null && (auth != null && auth.uid == $userId)"
+          },
+          ".read": "auth != null && (auth != null && auth.uid == $userId)"
+        }
+      }
+    },
+    "messaging": {
+      "room": {
+        "$key2": {
+          ".validate": "newData.hasChildren(['createdByUserId', 'isPublished', 'createdAt']) && $key2.matches(/^-[a-zA-Z0-9_-]+$/) && $key2.length > 0",
+          "sharedItem": {
+            ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+            "title": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "itemId": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "profileId": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          },
+          "sharedFavoritedList": {
+            ".validate": "newData.hasChildren() && newData.hasChildren(['category', 'keyword', 'ownerId'])",
+            "category": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "keyword": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "ownerId": {
+              ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+            },
+            "$other": {
+              ".validate": "false"
+            }
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          "createdByUserId": {
+            ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+          },
+          "isPublished": {
+            ".validate": "newData.isBoolean()"
+          },
+          ".write": "data.val() == null && (auth != null && auth.uid == newData.child('createdByUserId').val())",
+          "createdAt": {
+            ".validate": "newData.isNumber() && newData.val() == now"
+          }
+        },
+        ".validate": "newData.hasChildren()",
+        ".read": "true"
+      },
+      "public-room-calls-owner": {
+        "$ownerId": {
+          "$roomId": {
+            ".validate": "newData.isBoolean() && root.child('messaging').child('room').child($roomId).child('isPublished').val() == true",
+            ".write": "data.val() == null && newData.val() == !(auth.uid == root.child('messaging').child('room').child($roomId).child('createdByUserId').val()) || data.val() != null && newData.val() != null && data.val() == true && newData.val() == !(auth.uid == root.child('messaging').child('room').child($roomId).child('createdByUserId').val())"
+          },
+          ".validate": "root.child('users').child($ownerId).val() != null && root.child('users').child($ownerId).child('name').val() != null",
+          ".indexOn": [
+            ".value"
+          ]
+        }
+      },
+      "room-last-message": {
+        "$roomId": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().matches(/^-[a-zA-Z0-9_-]+$/) && root.child('messaging').child('room-messages').child($roomId).child(newData.val()).val() != null && root.child('messaging').child('room').child($roomId).val() != null",
+          ".write": "root.child('messaging').child('room-users').child($roomId).child(auth.uid).val() != null && root.child('messaging').child('user-rooms').child(auth.uid).child($roomId).val() != null || auth.uid == root.child('messaging').child('room').child($roomId).child('createdByUserId').val()"
+        }
+      },
+      "room-typing": {
+        "$roomId": {
+          "$userId": {
+            ".validate": "newData.isNumber() && newData.val() == now && root.child('messaging').child('room').child($roomId).val() != null && (root.child('users').child($userId).val() != null && root.child('users').child($userId).child('name').val() != null)",
+            ".read": "root.child('messaging').child('room-users').child($roomId).child(auth.uid).val() != null && root.child('messaging').child('user-rooms').child(auth.uid).child($roomId).val() != null",
+            ".write": "auth != null && auth.uid == $userId && ($userId == root.child('messaging').child('room').child($roomId).child('createdByUserId').val() || root.child('messaging').child('room').child($roomId).child('isPublished').val() == true)"
+          }
+        }
+      },
+      "room-users": {
+        "$roomId": {
+          "$userId": {
+            ".validate": "newData.hasChildren(['createdAt']) && (root.child('users').child($userId).val() != null && root.child('users').child($userId).child('name').val() != null)",
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() == now"
+            },
+            "$other": {
+              ".validate": "false"
+            },
+            ".write": "auth != null && auth.uid == $userId && ($userId == root.child('messaging').child('room').child($roomId).child('createdByUserId').val() || root.child('messaging').child('room').child($roomId).child('isPublished').val() == true)"
+          },
+          ".validate": "root.child('messaging').child('room').child($roomId).val() != null",
+          ".read": "root.child('messaging').child('room-users').child($roomId).child(auth.uid).val() != null && root.child('messaging').child('user-rooms').child(auth.uid).child($roomId).val() != null",
+          ".indexOn": [
+            "createdAt"
+          ]
+        }
+      },
+      "user-rooms": {
+        "$userId": {
+          "$roomId": {
+            ".validate": "newData.hasChildren(['createdAt']) && (newData.child('lastSeenMessageId').val() == null || root.child('messaging').child('room-messages').child($roomId).child(newData.child('lastSeenMessageId').val()).val() != null) && root.child('messaging').child('room').child($roomId).val() != null",
+            "lastSeen": {
+              ".validate": "newData.isNumber() && newData.val() == now"
+            },
+            "lastSeenMessageId": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().matches(/^-[a-zA-Z0-9_-]+$/)"
+            },
+            "isWatchingTheRoom": {
+              ".validate": "newData.isBoolean()"
+            },
+            "$other": {
+              ".validate": "false"
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() == now"
+            },
+            ".write": "data.val() == null && ($userId == root.child('messaging').child('room').child($roomId).child('createdByUserId').val() || root.child('messaging').child('room').child($roomId).child('isPublished').val() == true)"
+          },
+          ".validate": "root.child('users').child($userId).val() != null && root.child('users').child($userId).child('name').val() != null",
+          ".read": "auth != null && auth.uid == $userId",
+          ".write": "auth != null && auth.uid == $userId",
+          ".indexOn": [
+            "isWatchingTheRoom"
+          ]
+        }
+      },
+      "room-messages": {
+        "$roomId": {
+          "$msgId": {
+            ".validate": "newData.hasChildren(['author', 'createdAt']) && (auth != null && auth.uid == newData.child('author').val()) && $msgId.matches(/^-[a-zA-Z0-9_-]+$/)",
+            "sharedItem": {
+              ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+              "title": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "itemId": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "profileId": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "$other": {
+                ".validate": "false"
+              }
+            },
+            "sharedFavoritedList": {
+              ".validate": "newData.hasChildren() && newData.hasChildren(['category', 'keyword', 'ownerId'])",
+              "category": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "keyword": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "ownerId": {
+                ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+              },
+              "$other": {
+                ".validate": "false"
+              }
+            },
+            "$other": {
+              ".validate": "false"
+            },
+            "author": {
+              ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+            },
+            "message": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "images": {
+              "$key3": {
+                ".validate": "newData.isString() && newData.val().length > 0 && newData.val().beginsWith('http')"
+              },
+              ".validate": "newData.hasChildren()"
+            },
+            "sharedFavoritedListSwipe": {
+              ".validate": "newData.hasChildren() && newData.hasChildren(['item', 'favoritedList', 'action'])",
+              "item": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+                "title": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "itemId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "profileId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              },
+              "favoritedList": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['category', 'keyword', 'ownerId'])",
+                "category": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "keyword": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "ownerId": {
+                  ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              },
+              "action": {
+                ".validate": "newData.isString() && newData.val() == 'favorite'"
+              },
+              "$other": {
+                ".validate": "false"
+              }
+            },
+            "sharedFavoritedListReaction": {
+              ".validate": "newData.hasChildren() && newData.hasChildren(['item', 'emoji']) && newData.hasChildren(['favoritedList'])",
+              "item": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+                "title": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "itemId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "profileId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              },
+              "emoji": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "$other": {
+                ".validate": "false"
+              },
+              "favoritedList": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['category', 'keyword', 'ownerId'])",
+                "category": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "keyword": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "ownerId": {
+                  ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              }
+            },
+            "sharedItemReaction": {
+              ".validate": "newData.hasChildren() && newData.hasChildren(['item', 'emoji'])",
+              "item": {
+                ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+                "title": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "itemId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "profileId": {
+                  ".validate": "newData.isString() && newData.val().length > 0"
+                },
+                "$other": {
+                  ".validate": "false"
+                }
+              },
+              "emoji": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "$other": {
+                ".validate": "false"
+              }
+            },
+            "createdAt": {
+              ".validate": "newData.isNumber() && newData.val() == now"
+            },
+            ".write": "root.child('messaging').child('room-users').child($roomId).child(auth.uid).val() != null && root.child('messaging').child('user-rooms').child(auth.uid).child($roomId).val() != null || auth.uid == root.child('messaging').child('room').child($roomId).child('createdByUserId').val()"
+          },
+          ".read": "root.child('messaging').child('room-users').child($roomId).child(auth.uid).val() != null && root.child('messaging').child('user-rooms').child(auth.uid).child($roomId).val() != null",
+          ".indexOn": [
+            "createdAt"
+          ]
+        }
+      },
+      "conversations": {
+        "$userId": {
+          "count": {
+            ".validate": "newData.isNumber()"
+          },
+          "list": {
+            "$key4": {
+              ".validate": "newData.hasChildren(['lastMessageDate', 'lastSeenDate', 'otherUsersCount', 'changedAt']) && root.child('messaging').child('room').child($key4).val() != null && $key4.length > 0",
+              "title": {
+                ".validate": "newData.isString() && newData.val().length > 0"
+              },
+              "lastMessageDate": {
+                ".validate": "newData.isNumber()"
+              },
+              "lastSeenDate": {
+                ".validate": "newData.isNumber()"
+              },
+              "otherUsersCount": {
+                ".validate": "newData.isNumber()"
+              },
+              "firstUsers": {
+                "$key5": {
+                  ".validate": "newData.hasChildren(['name']) && root.child('users').child($key5).val() != null && $key5.length > 0 && root.child('users').child($key5).val() != null",
+                  "name": {
+                    ".validate": "newData.isString() && newData.val().length > 0"
+                  },
+                  "avatar": {
+                    ".validate": "newData.isString() && newData.val().length > 0 && newData.val().beginsWith('http')"
+                  },
+                  "$other": {
+                    ".validate": "false"
+                  }
+                },
+                ".validate": "newData.hasChildren()"
+              },
+              "$other": {
+                ".validate": "false"
+              },
+              "changedAt": {
+                ".validate": "newData.isNumber() && newData.val() == now"
+              }
+            },
+            ".validate": "newData.hasChildren()",
+            ".indexOn": [
+              "changedAt",
+              "lastSeenDate"
+            ]
+          },
+          ".validate": "root.child('users').child($userId).val() != null && root.child('users').child($userId).child('name').val() != null",
+          ".read": "auth != null && auth.uid == $userId"
+        }
+      },
+      "reactions": {
+        "$roomId": {
+          "events": {
+            "$cardId": {
+              "$userId": {
+                "$emoji": {
+                  ".validate": "newData.hasChildren(['createdAt']) && (newData.child('sharedFavoritedListReaction').child('emoji').val() == $emoji || newData.child('sharedItemReaction').child('emoji').val() == $emoji && !(newData.child('sharedFavoritedListReaction').val() == true && newData.child('sharedItemReaction').val() == true)) && (root.child('users').child($userId).val() != null && root.child('users').child($userId).child('name').val() != null)",
+                  "sharedFavoritedListReaction": {
+                    ".validate": "newData.hasChildren() && newData.hasChildren(['item', 'emoji']) && newData.hasChildren(['favoritedList'])",
+                    "item": {
+                      ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+                      "title": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "itemId": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "profileId": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "$other": {
+                        ".validate": "false"
+                      }
+                    },
+                    "emoji": {
+                      ".validate": "newData.isString() && newData.val().length > 0"
+                    },
+                    "$other": {
+                      ".validate": "false"
+                    },
+                    "favoritedList": {
+                      ".validate": "newData.hasChildren() && newData.hasChildren(['category', 'keyword', 'ownerId'])",
+                      "category": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "keyword": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "ownerId": {
+                        ".validate": "newData.isString() && newData.val().length > 0 && root.child('users').child(newData.val()).val() != null"
+                      },
+                      "$other": {
+                        ".validate": "false"
+                      }
+                    }
+                  },
+                  "sharedItemReaction": {
+                    ".validate": "newData.hasChildren() && newData.hasChildren(['item', 'emoji'])",
+                    "item": {
+                      ".validate": "newData.hasChildren() && newData.hasChildren(['title', 'itemId', 'profileId'])",
+                      "title": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "itemId": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "profileId": {
+                        ".validate": "newData.isString() && newData.val().length > 0"
+                      },
+                      "$other": {
+                        ".validate": "false"
+                      }
+                    },
+                    "emoji": {
+                      ".validate": "newData.isString() && newData.val().length > 0"
+                    },
+                    "$other": {
+                      ".validate": "false"
+                    }
+                  },
+                  "$other": {
+                    ".validate": "false"
+                  },
+                  "createdAt": {
+                    ".validate": "newData.isNumber() && newData.val() == now"
+                  },
+                  ".write": "data.val() == null && (auth != null && auth.uid == $userId)"
+                }
+              }
+            }
+          },
+          "stats": {
+            "count": {
+              "$cardId": {
+                ".validate": "newData.isNumber()"
+              }
+            },
+            "details": {
+              "count": {
+                "$cardId": {
+                  "$emoji": {
+                    ".validate": "newData.isNumber()"
+                  }
+                }
+              },
+              "users": {
+                "$cardId": {
+                  "$emoji": {
+                    "$key6": {
+                      ".validate": "root.child('users').child($key6).val() != null && $key6.length > 0 && newData.isNumber() && newData.val() == now"
+                    },
+                    ".validate": "newData.hasChildren()"
+                  }
+                }
+              }
+            },
+            ".read": "true"
+          },
+          ".validate": "root.child('messaging').child('room').child($roomId).val() != null"
+        }
+      }
+    },
+    "surveys": {
+      "$userId": {
+        "$survey": {
+          ".validate": "newData.hasChildren(['answer', 'canceled', 'createdAt'])",
+          "answer": {
+            ".validate": "newData.isString()"
+          },
+          "canceled": {
+            ".validate": "newData.isBoolean()"
+          },
+          "$other": {
+            ".validate": "false"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber() && newData.val() == now"
+          },
+          ".write": "auth != null && (auth != null && auth.uid == $userId)"
+        },
+        ".validate": "root.child('users').child($userId).val() != null",
+        ".read": "auth != null && (auth != null && auth.uid == $userId)"
+      }
+    }
+  }
+}

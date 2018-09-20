@@ -1,0 +1,27 @@
+{
+  "surveys": {
+    ".read": true,
+    ".write": true,
+    "$userId": {
+      "$survey": {
+        ".validate": "newData.hasChildren(['answer', 'canceled', 'createdAt', 'read'])",
+        "answer": {
+          ".validate": "newData.isString()"
+        },
+        "canceled": {
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": {
+          ".validate": "false"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() == now"
+        },
+        "completed": {
+          ".validate": "newData.isBoolean()"
+        }
+      },
+      ".validate": "root.child('users').child($userId).val() != null",
+    }
+  }
+}

@@ -1,0 +1,31 @@
+@import 'views/styles/shared';
+
+.row-start {
+    padding-bottom: 20px;
+}
+
+//=====================================
+//  Buttons
+//-------------------------------------
+.start__button {
+    margin-left: 5px;
+    background: #2a2a2a;
+  
+    &:first-child {
+      margin: 0;
+    }
+  
+    color: #999;
+  
+    &:hover {
+      color: #eee;
+    }
+  
+    &:active {
+      background: #262626;
+    }
+  
+    &.active {
+      color: #ff0000;
+    }
+  }
