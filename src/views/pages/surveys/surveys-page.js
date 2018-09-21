@@ -35,6 +35,8 @@ class SurveysPage extends React.Component {
           addCluster({ groupid: 'group3', user: { userid: survey.key } })
         } else if (!survey.surveyId4.canceled && !survey.surveyId1.canceled) {
           addCluster({ groupid: 'group4', user: { userid: survey.key } })
+        } else {
+          addCluster({ groupid: 'group5', user: { userid: survey.key } })
         }
         updateSurvey(survey, {completed: true})
       }

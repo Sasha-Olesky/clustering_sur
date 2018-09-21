@@ -6,6 +6,7 @@ export const ClustersState = new Record({
     group2: new List(),
     group3: new List(),
     group4: new List(),
+    group5: new List(),
 });
 
 export function clustersReducer(state = new ClustersState(), {payload, type}) {
