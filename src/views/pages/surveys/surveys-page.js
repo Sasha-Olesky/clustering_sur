@@ -20,25 +20,27 @@ class SurveysPage extends React.Component {
       caption: 'Start'
     }
 
+    this.updateClusterCallback = this.updateClusterCallback.bind(this)
+
     this.updateInterval = 5000 // 5 seconds
     this.timerId = 0
   }
 
-  updateClusterCallback(surveys, updateSurvey, addCluster) {
-    surveys.map(survey => {
+  updateClusterCallback() {
+    this.props.surveys.map(survey => {
       if (!survey.completed) {
         if (!survey.surveyId1.canceled && !survey.surveyId3.canceled) {
-          addCluster({ groupid: 'group1', user: { userid: survey.key } })
+          this.props.addCluster({ groupid: 'group1', user: { userid: survey.key } })
         } else if (!survey.surveyId2.canceled && !survey.surveyId4.canceled) {
-          addCluster({ groupid: 'group2', user: { userid: survey.key } })
+          this.props.addCluster({ groupid: 'group2', user: { userid: survey.key } })
         } else if (!survey.surveyId3.canceled && !survey.surveyId5.canceled) {
-          addCluster({ groupid: 'group3', user: { userid: survey.key } })
+          this.props.addCluster({ groupid: 'group3', user: { userid: survey.key } })
         } else if (!survey.surveyId4.canceled && !survey.surveyId1.canceled) {
-          addCluster({ groupid: 'group4', user: { userid: survey.key } })
+          this.props.addCluster({ groupid: 'group4', user: { userid: survey.key } })
         } else {
-          addCluster({ groupid: 'group5', user: { userid: survey.key } })
+          this.props.addCluster({ groupid: 'group5', user: { userid: survey.key } })
         }
-        updateSurvey(survey, {completed: true})
+        this.props.updateSurvey(survey, {completed: true})
       }
       return survey
     })
@@ -54,16 +56,9 @@ class SurveysPage extends React.Component {
         this.setState({
           caption: this.state.status ? 'Stop' : 'Start'
         })
-    
+        
         if (this.state.status) {
-          this.timerId = setInterval(
-            this.updateClusterCallback(
-                this.props.surveys, 
-                this.props.updateSurvey, 
-                this.props.addCluster
-              ), 
-              this.updateInterval
-            )
+          this.timerId = setInterval(this.updateClusterCallback, this.updateInterval)
         } else {
           clearInterval(this.timerId);
         }
