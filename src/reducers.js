@@ -2,12 +2,12 @@ import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
 import { authReducer } from './auth';
 import { surveysReducer } from './surveys';
-import { analysisReducer } from './analysis';
+import { clustersReducer } from './clusters';
 
 
 export default combineReducers({
-  auth: authReducer,
   routing: routerReducer,
+  auth: authReducer,
   surveys: surveysReducer,
-  analysis: analysisReducer
+  clusters: clustersReducer
 });

@@ -14,7 +14,6 @@ export const surveyActions = {
     FILTER_SURVEYS: 'FILTER_SURVEYS',
     LOAD_SURVEYS_FULFILLED: 'LOAD_SURVEYS_FULFILLED',
   
-  
     createSurvey: survey => ({
         type: surveyActions.CREATE_SURVEY,
         payload: {survey: {...survey, completed: false}}

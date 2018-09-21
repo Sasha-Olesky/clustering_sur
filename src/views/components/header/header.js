@@ -9,7 +9,7 @@ const Header = ({authenticated, signOut}) => (
   <header className="header">
     <div className="g-row">
       <div className="g-col">
-        <h1 className="header__title">Analysis Suveys</h1>
+        <h1 className="header__title">Cluster Suveys</h1>
 
         <ul className="header__actions">
           {authenticated ? <li><Button onClick={signOut}>Sign out</Button></li> : null}
